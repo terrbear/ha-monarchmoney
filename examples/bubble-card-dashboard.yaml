@@ -1,0 +1,659 @@
+title: Monarch Finance
+views:
+  - path: finance
+    icon: mdi:finance
+    type: sections
+    max_columns: 4
+    dense_section_placement: false
+    cards: []
+    badges:
+      - type: entity
+        entity: sensor.monarch_summary_net_worth
+        name: Net Worth
+        color: green
+        show_state: true
+      - type: entity
+        entity: sensor.monarch_cashflow_income_this_month
+        name: Income
+        color: green
+        show_state: true
+      - type: entity
+        entity: sensor.monarch_cashflow_expenses_this_month
+        name: Expenses
+        color: red
+        show_state: true
+      - type: entity
+        entity: sensor.monarch_cashflow_savings_this_month
+        name: Savings
+        color: blue
+        show_state: true
+      - type: entity
+        entity: sensor.monarch_credit_score_member_1
+        name: Member 1
+        color: amber
+        show_state: true
+      - type: entity
+        entity: sensor.monarch_credit_score_member_2
+        name: Member 2
+        color: amber
+        show_state: true
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Financial Overview
+          - type: custom:bubble-card
+            card_type: button
+            button_type: state
+            entity: sensor.monarch_summary_net_worth
+            name: Net Worth
+            icon: mdi:chart-line
+            show_state: true
+            show_last_changed: true
+            scrolling_effect: false
+            styles: |
+              .bubble-button-card-container {
+                background: linear-gradient(135deg, rgba(46,125,50,0.85) 0%, rgba(27,94,32,0.95) 100%);
+                border: 1px solid rgba(255,255,255,0.12);
+                border-radius: 16px;
+              }
+              .bubble-state {
+                font-size: 16px !important;
+                font-weight: 700 !important;
+                letter-spacing: -0.5px;
+              }
+              .bubble-name {
+                opacity: 0.85;
+                font-size: 10px !important;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+              }
+            grid_options:
+              columns: full
+            sub_button:
+              main: []
+              bottom: []
+          - square: false
+            type: grid
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                button_type: state
+                entity: sensor.monarch_cashflow_income_this_month
+                name: Income
+                icon: mdi:arrow-up-bold-circle-outline
+                show_state: true
+                styles: |
+                  .bubble-icon { color: #66bb6a !important; }
+                  .bubble-button-card-container {
+                    background: rgba(76,175,80,0.12);
+                    border: 1px solid rgba(76,175,80,0.25);
+                  }
+              - type: custom:bubble-card
+                card_type: button
+                button_type: state
+                entity: sensor.monarch_cashflow_expenses_this_month
+                name: Expenses
+                icon: mdi:arrow-down-bold-circle-outline
+                show_state: true
+                styles: |
+                  .bubble-icon { color: #ef5350 !important; }
+                  .bubble-button-card-container {
+                    background: rgba(239,83,80,0.12);
+                    border: 1px solid rgba(239,83,80,0.25);
+                  }
+              - type: custom:bubble-card
+                card_type: button
+                button_type: state
+                entity: sensor.monarch_cashflow_savings_this_month
+                name: Savings
+                icon: mdi:piggy-bank-outline
+                show_state: true
+                show_attribute: true
+                attribute: savings_rate
+                styles: |
+                  .bubble-icon { color: #42a5f5 !important; }
+                  .bubble-button-card-container {
+                    background: rgba(66,165,245,0.12);
+                    border: 1px solid rgba(66,165,245,0.25);
+                  }
+            columns: 3
+            grid_options:
+              columns: full
+          - type: distribution
+            entities:
+              - entity: sensor.monarch_assets_investments
+                name: Investments
+              - entity: sensor.monarch_assets_real_estate
+                name: Real Estate
+              - entity: sensor.monarch_assets_vehicles
+                name: Vehicles
+              - entity: sensor.monarch_assets_cash
+                name: Cash
+              - entity: sensor.monarch_assets_other
+                name: Other
+              - entity: sensor.monarch_assets_valuables
+                name: Valuables
+            title: Assets
+          - type: distribution
+            entities:
+              - entity: sensor.monarch_liabilities_loans
+                name: Loans
+              - entity: sensor.monarch_liabilities_credit_cards
+                name: Credit Cards
+              - entity: sensor.monarch_liabilities_other
+                name: Other
+            title: Liabilities
+          - type: entities
+            entities:
+              - entity: sensor.monarch_summary_net_worth
+                secondary_info: last-changed
+              - entity: sensor.monarch_assets_cash
+              - entity: sensor.monarch_assets_investments
+              - entity: sensor.monarch_assets_real_estate
+              - entity: sensor.monarch_assets_vehicles
+              - entity: sensor.monarch_liabilities_credit_cards
+              - entity: sensor.monarch_liabilities_loans
+          - type: vertical-stack
+            cards:
+              - type: custom:sankey-chart
+                title: Net Worth Breakdown
+                layout: horizontal
+                height: 300
+                unit_prefix: k
+                round: 1
+                min_box_size: 20
+                min_box_distance: 8
+                show_states: true
+                show_units: true
+                show_names: true
+                show_icons: true
+                wide: true
+                min_state: 0
+                ignore_missing_entities: true
+                sections:
+                  - entities:
+                      - entity_id: sensor.monarch_summary_net_worth
+                        name: Net Worth
+                        color: var(--primary-color)
+                        children:
+                          - sensor.monarch_summary_total_assets
+                          - sensor.monarch_summary_total_liabilities
+                  - entities:
+                      - entity_id: sensor.monarch_summary_total_assets
+                        name: Assets
+                        color: var(--success-color)
+                        children:
+                          - sensor.monarch_assets_cash
+                          - sensor.monarch_assets_investments
+                          - sensor.monarch_assets_real_estate
+                          - sensor.monarch_assets_vehicles
+                      - entity_id: sensor.monarch_summary_total_liabilities
+                        name: Liabilities
+                        color: var(--error-color)
+                        children:
+                          - sensor.monarch_liabilities_credit_cards
+                          - sensor.monarch_liabilities_loans
+                  - entities:
+                      - entity_id: sensor.monarch_assets_cash
+                        name: Cash
+                        color: var(--success-color)
+                      - entity_id: sensor.monarch_assets_investments
+                        name: Investments
+                        color: '#4CAF50'
+                      - entity_id: sensor.monarch_assets_real_estate
+                        name: Real Estate
+                        color: '#8BC34A'
+                      - entity_id: sensor.monarch_assets_vehicles
+                        name: Vehicles
+                        color: '#CDDC39'
+                      - entity_id: sensor.monarch_liabilities_credit_cards
+                        name: Credit Cards
+                        color: var(--error-color)
+                      - entity_id: sensor.monarch_liabilities_loans
+                        name: Loans
+                        color: '#FF5722'
+                sort_dir: desc
+            grid_options:
+              columns: full
+        column_span: 4
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#assets'
+                name: Assets
+                icon: mdi:trending-up
+                entity: sensor.monarch_summary_net_worth
+                show_state: true
+                show_last_changed: true
+                styles: |
+                  .bubble-pop-up-container {
+                    background: linear-gradient(180deg, rgba(46,125,50,0.3) 0%, var(--ha-card-background, var(--card-background-color)) 30%) !important;
+                  }
+              - type: custom:bubble-card
+                card_type: separator
+                name: Asset Breakdown
+                icon: mdi:finance
+                styles: |
+                  .bubble-line {
+                    background: rgba(76,175,80,0.4) !important;
+                  }
+              - type: distribution
+                entities:
+                  - entity: sensor.monarch_assets_investments
+                  - entity: sensor.monarch_assets_real_estate
+                  - entity: sensor.monarch_assets_vehicles
+                  - entity: sensor.monarch_assets_cash
+                  - entity: sensor.monarch_assets_valuables
+                  - entity: sensor.monarch_assets_other
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: state
+                    entity: sensor.monarch_assets_cash
+                    name: Cash
+                    icon: mdi:cash-multiple
+                    show_state: true
+                    styles: |
+                      .bubble-icon { color: #66bb6a !important; }
+                      .bubble-button-card-container {
+                        background: rgba(76,175,80,0.10);
+                        border-left: 3px solid #66bb6a;
+                      }
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: state
+                    entity: sensor.monarch_assets_investments
+                    name: Investments
+                    icon: mdi:chart-areaspline
+                    show_state: true
+                    styles: |
+                      .bubble-icon { color: #42a5f5 !important; }
+                      .bubble-button-card-container {
+                        background: rgba(66,165,245,0.10);
+                        border-left: 3px solid #42a5f5;
+                      }
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: state
+                    entity: sensor.monarch_assets_real_estate
+                    name: Real Estate
+                    icon: mdi:home-city-outline
+                    show_state: true
+                    styles: |
+                      .bubble-icon { color: #ab47bc !important; }
+                      .bubble-button-card-container {
+                        background: rgba(171,71,188,0.10);
+                        border-left: 3px solid #ab47bc;
+                      }
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: state
+                    entity: sensor.monarch_assets_vehicles
+                    name: Vehicles
+                    icon: mdi:car
+                    show_state: true
+                    styles: |
+                      .bubble-icon { color: #ffa726 !important; }
+                      .bubble-button-card-container {
+                        background: rgba(255,167,38,0.10);
+                        border-left: 3px solid #ffa726;
+                      }
+              - type: custom:bubble-card
+                card_type: separator
+                name: Asset Trends
+                icon: mdi:chart-line
+                styles: |
+                  .bubble-line {
+                    background: rgba(76,175,80,0.4) !important;
+                  }
+              - type: custom:mini-graph-card
+                name: Investments
+                entities:
+                  - sensor.monarch_assets_investments
+                decimals: 0
+                hours_to_show: 168
+                line_color: '#42a5f5'
+                line_width: 4
+                font_size: 75
+                aggregate_func: last
+                animate: true
+                cache: true
+                show:
+                  graph: bar
+                  labels: true
+                smoothing: false
+              - type: custom:mini-graph-card
+                name: Cash
+                entities:
+                  - sensor.monarch_assets_cash
+                decimals: 0
+                hours_to_show: 168
+                line_color: '#66bb6a'
+                line_width: 4
+                font_size: 75
+                aggregate_func: last
+                animate: true
+                cache: true
+                show:
+                  graph: bar
+                  labels: true
+                smoothing: false
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#liabilities'
+                name: Liabilities
+                icon: mdi:credit-card-clock-outline
+                entity: sensor.monarch_liabilities_credit_cards
+                show_state: true
+                show_last_changed: true
+                styles: |
+                  .bubble-pop-up-container {
+                    background: linear-gradient(180deg, rgba(239,83,80,0.2) 0%, var(--ha-card-background, var(--card-background-color)) 30%) !important;
+                  }
+              - type: custom:bubble-card
+                card_type: separator
+                name: Liability Breakdown
+                icon: mdi:credit-card-clock-outline
+                styles: |
+                  .bubble-line {
+                    background: rgba(239,83,80,0.4) !important;
+                  }
+              - type: distribution
+                entities:
+                  - entity: sensor.monarch_liabilities_loans
+                  - entity: sensor.monarch_liabilities_credit_cards
+                  - entity: sensor.monarch_liabilities_other
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: state
+                    entity: sensor.monarch_liabilities_credit_cards
+                    name: Credit Cards
+                    icon: mdi:credit-card-outline
+                    show_state: true
+                    styles: |
+                      .bubble-icon { color: #ef5350 !important; }
+                      .bubble-button-card-container {
+                        background: rgba(239,83,80,0.10);
+                        border-left: 3px solid #ef5350;
+                      }
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: state
+                    entity: sensor.monarch_liabilities_loans
+                    name: Loans
+                    icon: mdi:hand-coin
+                    show_state: true
+                    styles: |
+                      .bubble-icon { color: #ff7043 !important; }
+                      .bubble-button-card-container {
+                        background: rgba(255,112,67,0.10);
+                        border-left: 3px solid #ff7043;
+                      }
+              - type: custom:bubble-card
+                card_type: separator
+                name: Liability Trends
+                icon: mdi:chart-line
+                styles: |
+                  .bubble-line {
+                    background: rgba(239,83,80,0.4) !important;
+                  }
+              - type: custom:mini-graph-card
+                name: Credit Card Balance
+                entities:
+                  - sensor.monarch_liabilities_credit_cards
+                decimals: 0
+                hours_to_show: 168
+                line_color: '#ef5350'
+                line_width: 4
+                font_size: 75
+                aggregate_func: last
+                animate: true
+                cache: true
+                color_thresholds:
+                  - color: '#f35c12'
+                    value: -2500
+                  - color: '#d30400'
+                    value: -3000
+                  - color: '#c0092b'
+                    value: -3500
+                show:
+                  graph: bar
+                  labels: true
+                smoothing: false
+              - type: custom:mini-graph-card
+                name: Investments vs. Loans
+                entities:
+                  - entity: sensor.monarch_assets_investments
+                    color: '#42a5f5'
+                  - entity: sensor.monarch_liabilities_loans
+                    color: '#ff7043'
+                decimals: 0
+                hours_to_show: 168
+                line_width: 3
+                font_size: 75
+                animate: true
+                show:
+                  labels: true
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#credit'
+                name: Credit
+                icon: mdi:shield-check-outline
+                show_state: false
+                styles: |
+                  .bubble-pop-up-container {
+                    background: linear-gradient(180deg, rgba(255,183,77,0.2) 0%, var(--ha-card-background, var(--card-background-color)) 30%) !important;
+                  }
+                button_type: name
+                sub_button:
+                  main: []
+                  bottom: []
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    entity: sensor.monarch_credit_score_member_1
+                    name: Member 1
+                    min: 0
+                    max: 850
+                    needle: true
+                    segments:
+                      - from: 0
+                        color: var(--error-color)
+                      - from: 670
+                        color: var(--info-color)
+                      - from: 740
+                        color: var(--warning-color)
+                      - from: 800
+                        color: var(--success-color)
+                  - type: gauge
+                    entity: sensor.monarch_credit_score_member_2
+                    name: Member 2
+                    min: 0
+                    max: 850
+                    needle: true
+                    segments:
+                      - from: 0
+                        color: var(--error-color)
+                      - from: 670
+                        color: var(--info-color)
+                      - from: 740
+                        color: var(--warning-color)
+                      - from: 800
+                        color: var(--success-color)
+              - type: custom:mini-graph-card
+                name: Credit Card Balance
+                entities:
+                  - sensor.monarch_liabilities_credit_cards
+                decimals: 0
+                hours_to_show: 168
+                line_color: '#ef5350'
+                line_width: 4
+                font_size: 75
+                aggregate_func: last
+                animate: true
+                cache: true
+                color_thresholds:
+                  - color: '#f35c12'
+                    value: -2500
+                  - color: '#d30400'
+                    value: -3000
+                  - color: '#c0092b'
+                    value: -3500
+                show:
+                  graph: bar
+                  labels: true
+                smoothing: false
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#trends'
+                name: Trends
+                icon: mdi:chart-line-variant
+                entity: sensor.monarch_summary_net_worth
+                show_state: true
+                styles: |
+                  .bubble-pop-up-container {
+                    background: linear-gradient(180deg, rgba(66,165,245,0.2) 0%, var(--ha-card-background, var(--card-background-color)) 30%) !important;
+                  }
+              - type: custom:mini-graph-card
+                name: Net Worth
+                entities:
+                  - sensor.monarch_summary_net_worth
+                decimals: 0
+                hours_to_show: 168
+                line_width: 4
+                line_color: '#4caf50'
+                font_size: 75
+                animate: true
+                show:
+                  labels: true
+                  graph: line
+                smoothing: true
+              - type: custom:mini-graph-card
+                name: Income vs. Expenses
+                entities:
+                  - entity: sensor.monarch_cashflow_income_this_month
+                    color: '#66bb6a'
+                  - entity: sensor.monarch_cashflow_expenses_this_month
+                    color: '#ef5350'
+                decimals: 0
+                hours_to_show: 168
+                line_width: 3
+                font_size: 75
+                animate: true
+                show:
+                  labels: true
+                  graph: bar
+              - type: custom:mini-graph-card
+                name: Investments
+                entities:
+                  - sensor.monarch_assets_investments
+                decimals: 0
+                hours_to_show: 168
+                line_color: '#42a5f5'
+                line_width: 4
+                font_size: 75
+                aggregate_func: last
+                animate: true
+                cache: true
+                show:
+                  graph: bar
+                  labels: true
+                smoothing: false
+              - type: custom:mini-graph-card
+                name: Cash
+                entities:
+                  - sensor.monarch_assets_cash
+                decimals: 0
+                hours_to_show: 168
+                line_color: '#66bb6a'
+                line_width: 4
+                font_size: 75
+                aggregate_func: last
+                animate: true
+                cache: true
+                show:
+                  graph: bar
+                  labels: true
+                smoothing: false
+              - type: custom:mini-graph-card
+                name: Investments vs. Loans
+                entities:
+                  - entity: sensor.monarch_assets_investments
+                    color: '#42a5f5'
+                  - entity: sensor.monarch_liabilities_loans
+                    color: '#ff7043'
+                decimals: 0
+                hours_to_show: 168
+                line_width: 3
+                font_size: 75
+                animate: true
+                show:
+                  labels: true
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#bills'
+                name: Upcoming Bills
+                icon: mdi:calendar-clock
+                show_state: false
+                styles: |
+                  .bubble-pop-up-container {
+                    background: linear-gradient(180deg, rgba(171,71,188,0.2) 0%, var(--ha-card-background, var(--card-background-color)) 30%) !important;
+                  }
+              - type: calendar
+                initial_view: listWeek
+                entities:
+                  - calendar.monarch_recurring_transactions
+                title: Recurring Transactions
+    footer:
+      card:
+        type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: horizontal-buttons-stack
+            auto_order: false
+            1_link: '#assets'
+            1_icon: mdi:trending-up
+            1_name: Assets
+            1_entity: sensor.monarch_assets_cash
+            2_link: '#liabilities'
+            2_icon: mdi:credit-card-clock-outline
+            2_name: Debts
+            2_entity: sensor.monarch_liabilities_credit_cards
+            3_link: '#credit'
+            3_icon: mdi:shield-check-outline
+            3_name: Credit
+            4_link: '#trends'
+            4_icon: mdi:chart-line-variant
+            4_name: Trends
+            4_entity: sensor.monarch_summary_net_worth
+            5_link: '#bills'
+            5_icon: mdi:calendar-clock
+            5_name: Bills
+            5_entity: calendar.monarch_recurring_transactions

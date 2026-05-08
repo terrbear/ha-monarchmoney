@@ -7,8 +7,6 @@ __pycache__
 .beads/
 .gitattributes
 
-.claude
-
 AGENTS.md
 
 .venv/

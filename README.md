@@ -50,11 +50,39 @@ After setup, go to the integration's **Options** to configure:
 | Aggregated holdings | Off | Enable aggregated investment holdings across accounts |
 | Recurring transactions | Off | Enable recurring transactions calendar |
 
+## Screenshots
+
+A multi-tab dashboard built with [Bubble Card](https://github.com/Clooos/Bubble-Card), [mini-graph-card](https://github.com/kalkih/mini-graph-card), and [sankey-chart-card](https://github.com/MindFreeze/ha-sankey-chart). Numbers in screenshots are blurred for privacy.
+
+### Overview (tablet)
+
+<img src="screenshots/01-overview-tablet.png" alt="Overview tablet view" width="900">
+
+### Net Worth Breakdown (sankey)
+
+<img src="screenshots/02-net-worth-sankey.png" alt="Net Worth Sankey" width="900">
+
+### Mobile tabs
+
+<p>
+  <img src="screenshots/04-assets-tab.png" alt="Assets" width="220">
+  <img src="screenshots/05-debts-tab.png" alt="Debts" width="220">
+  <img src="screenshots/06-credit-tab.png" alt="Credit" width="220">
+  <img src="screenshots/07-trends-tab.png" alt="Trends" width="220">
+  <img src="screenshots/08-bills-tab.png" alt="Bills" width="220">
+</p>
+
+### Account sensors
+
+<img src="screenshots/03-account-sensors.png" alt="Account sensors list" width="380">
+
+A working dashboard YAML using these cards is in [`examples/bubble-card-dashboard.yaml`](examples/bubble-card-dashboard.yaml). It expects the `monarch_credit_score_*` entities to match your household member names; rename them as needed.
+
 ## Planned
 
-- [ ] Add screenshot with masked numbers
 - [ ] Optional sensors for recent transactions (configurable count)
 
 ## Credits
 
-- [monarchmoneycommunity](https://github.com/bradleyseanf/monarchmoneycommunity) (Forked from [monarchmoney](https://github.com/hammem/monarchmoney))
+- [monarchmoneycommunity](https://github.com/bradleyseanf/monarchmoneycommunity) (forked from [monarchmoney](https://github.com/hammem/monarchmoney))
+- Dashboard examples use [Bubble Card](https://github.com/Clooos/Bubble-Card), [mini-graph-card](https://github.com/kalkih/mini-graph-card), and [sankey-chart-card](https://github.com/MindFreeze/ha-sankey-chart)
