@@ -13,6 +13,7 @@ from custom_components.monarchmoney.models import (
     Institution,
     MonarchData,
     RecurringTransaction,
+    Transaction,
     TransactionCategory,
 )
 from tests.const import (
@@ -22,6 +23,7 @@ from tests.const import (
     MOCK_CREDIT_RESPONSE,
     MOCK_HOLDINGS_RESPONSE,
     MOCK_RECURRING_RESPONSE,
+    MOCK_TRANSACTIONS_RESPONSE,
 )
 
 
@@ -212,6 +214,46 @@ class TestRecurringTransaction:
 
 
 # ---------------------------------------------------------------------------
+# Recent transaction models
+# ---------------------------------------------------------------------------
+
+
+class TestTransaction:
+    def test_valid_item(self) -> None:
+        raw = MOCK_TRANSACTIONS_RESPONSE["allTransactions"]["results"][0]
+        t = Transaction.from_api(raw)
+        assert t is not None
+        assert t.id == "txn_1"
+        assert t.merchant_name == "Whole Foods"
+        assert t.amount == -84.32
+        assert t.category_name == "Groceries"
+        assert t.account_name == "Primary Checking"
+        assert t.pending is False
+
+    def test_none_merchant(self) -> None:
+        raw = MOCK_TRANSACTIONS_RESPONSE["allTransactions"]["results"][2]
+        t = Transaction.from_api(raw)
+        assert t is not None
+        assert t.merchant_name == "Unknown"
+
+    def test_pending_flag(self) -> None:
+        raw = MOCK_TRANSACTIONS_RESPONSE["allTransactions"]["results"][1]
+        t = Transaction.from_api(raw)
+        assert t is not None
+        assert t.pending is True
+
+    def test_missing_id_filtered(self) -> None:
+        raw = {"amount": -10.0, "merchant": {"name": "Test"}}
+        result = Transaction.from_api(raw)
+        assert result is None
+
+    def test_notes_default_empty(self) -> None:
+        t = Transaction.from_api({"id": "x"})
+        assert t is not None
+        assert t.notes == ""
+
+
+# ---------------------------------------------------------------------------
 # MonarchData container
 # ---------------------------------------------------------------------------
 
@@ -224,3 +266,4 @@ class TestMonarchData:
         assert d.credit_history is None
         assert d.holdings == []
         assert d.recurring == []
+        assert d.transactions == []

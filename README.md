@@ -15,6 +15,7 @@ Track all your Monarch Money financial data - account balances, net worth, cash 
 - **Credit Score sensors** *(optional)* - per household member, with score history and change tracking
 - **Investment Holdings sensors** *(optional)* - individual securities with price, quantity, cost basis, and gain/loss
 - **Recurring Transactions calendar** *(optional)* - upcoming bills and subscriptions as calendar events
+- **Recent Transactions sensor** *(optional)* - most recent transactions (configurable count), with merchant/category/account/amount as attributes
 - **Refresh button** - manually trigger a data refresh
 - **MFA support** - manual code entry or automatic TOTP via secret key
 
@@ -49,6 +50,8 @@ After setup, go to the integration's **Options** to configure:
 | Investment holdings | Off | Enable per-security holding sensors |
 | Aggregated holdings | Off | Enable aggregated investment holdings across accounts |
 | Recurring transactions | Off | Enable recurring transactions calendar |
+| Recent transactions | Off | Enable recent transactions sensor |
+| Recent transactions count | 10 | How many recent transactions to fetch (10, 25, 50, 100) |
 
 ## Screenshots
 
@@ -77,10 +80,6 @@ A multi-tab dashboard built with [Bubble Card](https://github.com/Clooos/Bubble-
 <img src="screenshots/03-account-sensors.png" alt="Account sensors list" width="380">
 
 A working dashboard YAML using these cards is in [`examples/bubble-card-dashboard.yaml`](examples/bubble-card-dashboard.yaml). It expects the `monarch_credit_score_*` entities to match your household member names; rename them as needed.
-
-## Planned
-
-- [ ] Optional sensors for recent transactions (configurable count)
 
 ## Credits
 

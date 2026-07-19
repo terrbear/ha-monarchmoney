@@ -26,15 +26,19 @@ from .const import (
     CONF_ENABLE_CREDIT_SCORE,
     CONF_ENABLE_HOLDINGS,
     CONF_ENABLE_RECURRING,
+    CONF_ENABLE_TRANSACTIONS,
     CONF_MFA_CODE,
     CONF_MFA_SECRET,
     CONF_TIMEOUT,
     CONF_TOKEN,
+    CONF_TRANSACTIONS_COUNT,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_TIMEOUT,
+    DEFAULT_TRANSACTIONS_COUNT,
     DOMAIN,
     VALUES_SCAN_INTERVAL,
     VALUES_TIMEOUT,
+    VALUES_TRANSACTIONS_COUNT,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -100,6 +104,16 @@ TIMEOUT_SELECTOR = SelectSelector(
     )
 )
 
+TRANSACTIONS_COUNT_SELECTOR = SelectSelector(
+    SelectSelectorConfig(
+        options=[
+            SelectOptionDict(value=str(k), label=v)
+            for k, v in VALUES_TRANSACTIONS_COUNT.items()
+        ],
+        mode=SelectSelectorMode.DROPDOWN,
+    )
+)
+
 
 def _build_options_schema(
     scan_interval: int = DEFAULT_SCAN_INTERVAL,
@@ -108,6 +122,8 @@ def _build_options_schema(
     enable_holdings: bool = False,
     enable_aggregated_holdings: bool = False,
     enable_recurring: bool = False,
+    enable_transactions: bool = False,
+    transactions_count: int = DEFAULT_TRANSACTIONS_COUNT,
 ) -> vol.Schema:
     """Build options schema with current values as defaults."""
     return vol.Schema(
@@ -130,6 +146,12 @@ def _build_options_schema(
             vol.Optional(
                 CONF_ENABLE_RECURRING, default=enable_recurring
             ): bool,
+            vol.Optional(
+                CONF_ENABLE_TRANSACTIONS, default=enable_transactions
+            ): bool,
+            vol.Required(
+                CONF_TRANSACTIONS_COUNT, default=str(transactions_count)
+            ): TRANSACTIONS_COUNT_SELECTOR,
         }
     )
 
@@ -429,6 +451,9 @@ class MonarchOptionsFlowHandler(OptionsFlow):
             # SelectSelector returns strings; convert back to int for storage
             user_input[CONF_SCAN_INTERVAL] = int(user_input[CONF_SCAN_INTERVAL])
             user_input[CONF_TIMEOUT] = int(user_input[CONF_TIMEOUT])
+            user_input[CONF_TRANSACTIONS_COUNT] = int(
+                user_input[CONF_TRANSACTIONS_COUNT]
+            )
             return self.async_create_entry(title="", data=user_input)
 
         opts = self.entry.options
@@ -441,5 +466,9 @@ class MonarchOptionsFlowHandler(OptionsFlow):
                 enable_holdings=opts.get(CONF_ENABLE_HOLDINGS, False),
                 enable_aggregated_holdings=opts.get(CONF_ENABLE_AGGREGATED_HOLDINGS, False),
                 enable_recurring=opts.get(CONF_ENABLE_RECURRING, False),
+                enable_transactions=opts.get(CONF_ENABLE_TRANSACTIONS, False),
+                transactions_count=int(
+                    opts.get(CONF_TRANSACTIONS_COUNT, DEFAULT_TRANSACTIONS_COUNT)
+                ),
             ),
         )

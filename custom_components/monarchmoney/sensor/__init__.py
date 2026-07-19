@@ -14,6 +14,7 @@ from ..const import (
     CONF_ENABLE_AGGREGATED_HOLDINGS,
     CONF_ENABLE_CREDIT_SCORE,
     CONF_ENABLE_HOLDINGS,
+    CONF_ENABLE_TRANSACTIONS,
     DOMAIN,
 )
 from ..update_coordinator import MonarchCoordinator
@@ -27,6 +28,7 @@ from .aggregated_holding import MonarchAggregatedHoldingSensor
 from .income import MonarchMoneyIncomeSensor
 from .net_worth import MonarchMoneyNetWorthSensor
 from .summary import MonarchMoneyTotalAssetsSensor, MonarchMoneyTotalLiabilitiesSensor
+from .transactions import MonarchRecentTransactionsSensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -134,5 +136,9 @@ async def async_setup_entry(
             sensors.append(
                 MonarchAggregatedHoldingSensor(coordinator, agg_data, unique_id)
             )
+
+    # Optional: Recent transactions sensor
+    if options.get(CONF_ENABLE_TRANSACTIONS, False):
+        sensors.append(MonarchRecentTransactionsSensor(coordinator, unique_id))
 
     async_add_entities(sensors, True)

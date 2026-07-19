@@ -20,6 +20,8 @@ CONF_ENABLE_RECURRING = "enable_recurring"
 CONF_ENABLE_CREDIT_SCORE = "enable_credit_score"
 CONF_ENABLE_HOLDINGS = "enable_holdings"
 CONF_ENABLE_AGGREGATED_HOLDINGS = "enable_aggregated_holdings"
+CONF_ENABLE_TRANSACTIONS = "enable_transactions"
+CONF_TRANSACTIONS_COUNT = "transactions_count"
 
 VALUES_SCAN_INTERVAL = {
     60: "60 minutes (1 hour)",
@@ -36,6 +38,13 @@ VALUES_TIMEOUT = {
     45: "45 seconds",
     60: "60 seconds",
 }
+VALUES_TRANSACTIONS_COUNT = {
+    10: "10 transactions",
+    25: "25 transactions",
+    50: "50 transactions",
+    100: "100 transactions",
+}
 
 DEFAULT_SCAN_INTERVAL = 60
 DEFAULT_TIMEOUT = 30
+DEFAULT_TRANSACTIONS_COUNT = 10

@@ -336,6 +336,44 @@ class RecurringTransaction:
 
 
 # ---------------------------------------------------------------------------
+# Recent transaction models
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True, slots=True)
+class Transaction:
+    """A single recent transaction."""
+
+    id: str
+    date: str
+    amount: float
+    merchant_name: str
+    category_name: str
+    account_name: str
+    pending: bool
+    notes: str
+
+    @classmethod
+    def from_api(cls, data: dict[str, Any]) -> Transaction | None:
+        """Return a Transaction or None when the id is missing."""
+        txn_id = data.get("id")
+        if not txn_id:
+            return None
+        merchant = data.get("merchant") or {}
+        category = data.get("category") or {}
+        account = data.get("account") or {}
+        return cls(
+            id=txn_id,
+            date=data.get("date", ""),
+            amount=data.get("amount", 0.0),
+            merchant_name=merchant.get("name") or "Unknown",
+            category_name=category.get("name", ""),
+            account_name=account.get("displayName", ""),
+            pending=data.get("pending", False),
+            notes=data.get("notes") or "",
+        )
+
+
+# ---------------------------------------------------------------------------
 # Top-level data container (mutable — built incrementally by coordinator)
 # ---------------------------------------------------------------------------
 
@@ -353,3 +391,4 @@ class MonarchData:
     credit_history: CreditHistory | None = None
     holdings: list[AccountHoldings] = field(default_factory=list)
     recurring: list[RecurringTransaction] = field(default_factory=list)
+    transactions: list[Transaction] = field(default_factory=list)

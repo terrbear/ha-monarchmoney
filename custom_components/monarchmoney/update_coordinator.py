@@ -23,10 +23,13 @@ from .const import (
     CONF_ENABLE_CREDIT_SCORE,
     CONF_ENABLE_HOLDINGS,
     CONF_ENABLE_RECURRING,
+    CONF_ENABLE_TRANSACTIONS,
     CONF_MFA_SECRET,
     CONF_TOKEN,
+    CONF_TRANSACTIONS_COUNT,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_TIMEOUT,
+    DEFAULT_TRANSACTIONS_COUNT,
     DOMAIN,
 )
 from .models import (
@@ -36,6 +39,7 @@ from .models import (
     CreditHistory,
     MonarchData,
     RecurringTransaction,
+    Transaction,
     TransactionCategory,
 )
 from .util import monarch_login
@@ -207,6 +211,10 @@ class MonarchCoordinator(DataUpdateCoordinator[MonarchData]):
                 end_date=end.strftime("%Y-%m-%d"),
             )
 
+        if options.get(CONF_ENABLE_TRANSACTIONS, False):
+            count = options.get(CONF_TRANSACTIONS_COUNT, DEFAULT_TRANSACTIONS_COUNT)
+            optional_tasks["transactions"] = self._api.get_transactions(limit=count)
+
         if optional_tasks:
             keys = list(optional_tasks.keys())
             results = await asyncio.gather(
@@ -223,6 +231,14 @@ class MonarchCoordinator(DataUpdateCoordinator[MonarchData]):
                         r
                         for i in items
                         if (r := RecurringTransaction.from_api(i)) is not None
+                    ]
+                elif key == "transactions":
+                    all_txns = result.get("allTransactions") or {}
+                    items = all_txns.get("results") or []
+                    data.transactions = [
+                        t
+                        for i in items
+                        if (t := Transaction.from_api(i)) is not None
                     ]
 
         # Holdings: one call per brokerage account (opt-in)

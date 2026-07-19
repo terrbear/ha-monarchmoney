@@ -26,6 +26,7 @@ from .const import (
     MOCK_PASSWORD,
     MOCK_RECURRING_RESPONSE,
     MOCK_TOKEN,
+    MOCK_TRANSACTIONS_RESPONSE,
 )
 
 
@@ -85,6 +86,7 @@ def mock_monarch_api():
     api.get_recurring_transactions = AsyncMock(
         return_value=MOCK_RECURRING_RESPONSE
     )
+    api.get_transactions = AsyncMock(return_value=MOCK_TRANSACTIONS_RESPONSE)
     api.get_account_holdings = AsyncMock(return_value=MOCK_HOLDINGS_RESPONSE)
     api.request_accounts_refresh = AsyncMock(return_value=None)
 

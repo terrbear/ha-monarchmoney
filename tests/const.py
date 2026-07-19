@@ -302,6 +302,50 @@ MOCK_RECURRING_RESPONSE: dict = {
 }
 
 # ---------------------------------------------------------------------------
+# MOCK_TRANSACTIONS_RESPONSE
+# ---------------------------------------------------------------------------
+# Matches get_transactions() response shape:
+#   allTransactions.results[].{id, amount, date, pending, notes,
+#   merchant.name, category.name, account.displayName}
+MOCK_TRANSACTIONS_RESPONSE: dict = {
+    "allTransactions": {
+        "totalCount": 3,
+        "results": [
+            {
+                "id": "txn_1",
+                "amount": -84.32,
+                "date": "2026-01-18",
+                "pending": False,
+                "notes": "",
+                "merchant": {"name": "Whole Foods"},
+                "category": {"name": "Groceries"},
+                "account": {"displayName": "Primary Checking"},
+            },
+            {
+                "id": "txn_2",
+                "amount": -15.99,
+                "date": "2026-01-17",
+                "pending": True,
+                "notes": "",
+                "merchant": {"name": "Netflix"},
+                "category": {"name": "Entertainment"},
+                "account": {"displayName": "Rewards Credit Card"},
+            },
+            {
+                "id": "txn_3",
+                "amount": 3000.00,
+                "date": "2026-01-16",
+                "pending": False,
+                "notes": "biweekly pay",
+                "merchant": None,
+                "category": {"name": "Salary"},
+                "account": {"displayName": "Primary Checking"},
+            },
+        ],
+    }
+}
+
+# ---------------------------------------------------------------------------
 # MOCK_HOLDINGS_RESPONSE
 # ---------------------------------------------------------------------------
 # Matches get_account_holdings(id) response shape:
