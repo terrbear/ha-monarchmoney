@@ -1,0 +1,46 @@
+get_transactions:
+  name: Get transactions
+  description: >-
+    Fetch Monarch Money transactions on demand (full history, not just the
+    "Recent Transactions" sensor's fixed window). Returns a response with the
+    matching transactions and the total count available.
+  fields:
+    start_date:
+      name: Start date
+      description: Earliest transaction date to include (YYYY-MM-DD). Must be paired with end_date.
+      example: "2026-01-01"
+      selector:
+        text:
+    end_date:
+      name: End date
+      description: Latest transaction date to include (YYYY-MM-DD). Must be paired with start_date.
+      example: "2026-01-31"
+      selector:
+        text:
+    limit:
+      name: Limit
+      description: Maximum number of transactions to return.
+      default: 100
+      selector:
+        number:
+          min: 1
+          max: 1000
+          mode: box
+    offset:
+      name: Offset
+      description: Number of transactions to skip, for paging through full history.
+      default: 0
+      selector:
+        number:
+          min: 0
+          mode: box
+    search:
+      name: Search
+      description: Free-text filter on merchant/notes.
+      selector:
+        text:
+    account:
+      name: Account
+      description: Restrict results to a single account, by its display name.
+      selector:
+        text:

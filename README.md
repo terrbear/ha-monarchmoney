@@ -53,6 +53,23 @@ After setup, go to the integration's **Options** to configure:
 | Recent transactions | Off | Enable recent transactions sensor |
 | Recent transactions count | 10 | How many recent transactions to fetch (10, 25, 50, 100) |
 
+## Full transaction history
+
+The "Recent Transactions" sensor only ever holds its configured count, so it's meant for
+at-a-glance dashboard use, not history. For anything beyond that — larger date ranges,
+paging through everything, filtering by account — call the `monarchmoney.get_transactions`
+action (Developer Tools > Actions, or from a script/automation). It queries Monarch directly
+and returns the matching transactions plus a total count, without touching sensor state:
+
+```yaml
+action: monarchmoney.get_transactions
+data:
+  start_date: "2026-01-01"
+  end_date: "2026-01-31"
+  limit: 500
+response_variable: jan_transactions
+```
+
 ## Screenshots
 
 A multi-tab dashboard built with [Bubble Card](https://github.com/Clooos/Bubble-Card), [mini-graph-card](https://github.com/kalkih/mini-graph-card), and [sankey-chart-card](https://github.com/MindFreeze/ha-sankey-chart). Numbers in screenshots are blurred for privacy.

@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import logging
 
+import voluptuous as vol
+
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
+from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
+from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import config_validation as cv, entity_registry as er
 
 from .const import (
     CONF_ENABLE_AGGREGATED_HOLDINGS,
@@ -16,9 +19,25 @@ from .const import (
     DOMAIN,
     PLATFORMS,
 )
+from .models import Transaction
 from .update_coordinator import MonarchCoordinator
 
 _LOGGER = logging.getLogger(__name__)
+
+SERVICE_GET_TRANSACTIONS = "get_transactions"
+
+GET_TRANSACTIONS_SCHEMA = vol.Schema(
+    {
+        vol.Optional("start_date"): cv.string,
+        vol.Optional("end_date"): cv.string,
+        vol.Optional("limit", default=100): vol.All(
+            vol.Coerce(int), vol.Range(min=1, max=1000)
+        ),
+        vol.Optional("offset", default=0): vol.All(vol.Coerce(int), vol.Range(min=0)),
+        vol.Optional("search", default=""): cv.string,
+        vol.Optional("account"): cv.string,
+    }
+)
 
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
@@ -36,6 +55,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_update_options))
+
+    if not hass.services.has_service(DOMAIN, SERVICE_GET_TRANSACTIONS):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_GET_TRANSACTIONS,
+            _async_get_transactions_service(hass),
+            schema=GET_TRANSACTIONS_SCHEMA,
+            supports_response=SupportsResponse.ONLY,
+        )
+
     return True
 
 
@@ -44,7 +73,73 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if ok:
         hass.data[DOMAIN].pop(entry.entry_id)
+        if not hass.data[DOMAIN]:
+            hass.services.async_remove(DOMAIN, SERVICE_GET_TRANSACTIONS)
     return ok
+
+
+def _async_get_transactions_service(hass: HomeAssistant):
+    """Build the get_transactions service handler bound to this hass instance."""
+
+    async def _handler(call: ServiceCall) -> ServiceResponse:
+        coordinators: list[MonarchCoordinator] = list(hass.data.get(DOMAIN, {}).values())
+        if not coordinators:
+            raise HomeAssistantError("No Monarch Money account is configured")
+        coordinator = coordinators[0]
+
+        start_date = call.data.get("start_date")
+        end_date = call.data.get("end_date")
+        account_ids: list[str] = []
+        account_name = call.data.get("account")
+        if account_name:
+            data = coordinator.data
+            match = next(
+                (
+                    a
+                    for a in (data.accounts if data else [])
+                    if a.display_name == account_name
+                ),
+                None,
+            )
+            if match is None:
+                raise HomeAssistantError(f"Unknown account: {account_name}")
+            account_ids = [match.id]
+
+        try:
+            raw = await coordinator.api.get_transactions(
+                limit=call.data["limit"],
+                offset=call.data["offset"],
+                start_date=start_date,
+                end_date=end_date,
+                search=call.data["search"],
+                account_ids=account_ids,
+            )
+        except Exception as err:
+            raise HomeAssistantError(f"Failed to fetch transactions: {err}") from err
+        all_txns = raw.get("allTransactions") or {}
+        items = all_txns.get("results") or []
+        transactions = [
+            t for i in items if (t := Transaction.from_api(i)) is not None
+        ]
+
+        return {
+            "total_count": all_txns.get("totalCount", len(transactions)),
+            "transactions": [
+                {
+                    "id": t.id,
+                    "date": t.date,
+                    "amount": t.amount,
+                    "merchant": t.merchant_name,
+                    "category": t.category_name,
+                    "account": t.account_name,
+                    "pending": t.pending,
+                    "notes": t.notes,
+                }
+                for t in transactions
+            ],
+        }
+
+    return _handler
 
 
 async def _async_update_options(
